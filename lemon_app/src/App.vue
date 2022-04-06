@@ -1,6 +1,6 @@
 <template>
   <LivestreamMain/>
-</template>
+ </template>
 
 <script>
 import LivestreamMain from './components/LivestreamMain.vue'
@@ -8,7 +8,7 @@ import LivestreamMain from './components/LivestreamMain.vue'
 export default {
   name: 'App',
   components: {
-    LivestreamMain
+    LivestreamMain,
   }
 }
 </script>
