@@ -12,14 +12,19 @@
         Add Media Source
       </a-button>
       <div class='card_stream' v-if='showStream'>
-        <a-button v-if='showOnStream' class='show_on_stream' type='default' @click='showingStreamOption'>Show on Stream</a-button>
-        <a-button v-if='!showOnStream' class='show_on_stream' type='danger' @click='showingStreamOption'>Hide on Stream</a-button>
+        <a-button v-if='!streamImageShowing' class='show_on_stream' type='default' @click='streamImageOnStream'>Show on Stream</a-button>
+        <a-button v-if='streamImageShowing' class='show_on_stream' type='danger' @click='streamImageOnStream'>Hide on Stream</a-button>
         <img alt='camera' src='../assets/camera.png' style='width: 150px;' />
+      </div>
+      <div class='card_stream' v-if='showScreen'>
+        <a-button v-if='!screenImageShowing' class='show_on_stream' type='default' @click='screenImageOnStream'>Show on Stream</a-button>
+        <a-button v-if='screenImageShowing' class='show_on_stream' type='danger' @click='screenImageOnStream'>Hide on Stream</a-button>
+        <img alt='screen' src='../assets/screenshare.png' style='width: 150px;' />
       </div>
       <a-modal v-model:visible='visible' title='Add a new media source' @ok='handleOk' footer=''>
         <div class='new_media_source'>
           <a-space align='center'>
-            <a-button type='default'>Screenshare</a-button>
+            <a-button class='screen_choice' type='default' @click='showingScreenOption()'>Screenshare</a-button>
             <a-button class='stream_choice' type='default' @click='showUserTheirFace()'>Video Feed</a-button>
           </a-space>
         </div>
@@ -29,15 +34,21 @@
     <a-layout :style="{ marginLeft: '200px' }">
       <a-layout-header :style="{ background: '#fff', padding: 0 }" />
       <a-layout-content :style="{ margin: '24px 16px 0', overflow: 'initial' }">
-        <div :style="{ background: '#000', padding: '24px', textAlign: 'center' }">
-          <div class='stream'>
-            <iframe class='iframe' style='height: auto; width: 100%;'>
-              <video class='main_stream' style='aspect-ratio: 16/9;' autoplay playsinline></video>
-            </iframe>
+        <div class='stream' :style="{ background: '#000', padding: '24px', textAlign: 'center' }">
+          <div>
+              <div v-if='streamImageShowing'>
+                <img class='image_camera' style='aspect-ratio: 16/9;' alt='camera' src='../assets/camera.png' />
+              </div>
+              <div v-if='screenImageShowing'>
+                <img class='image_camera' style='aspect-ratio: 16/9;' alt='screen' src='../assets/screenshare.png' />
+              </div>
           </div>
+            <video class='main_stream' style='aspect-ratio: 16/9;' autoplay playsinline></video>
         </div>
-        <div>
-          <a-button type='default'>Resize</a-button>
+        <div v-if='streamImageShowing'>
+          <a-button type='default'>Resize 1</a-button>
+          <a-button type='default'>Resize 2</a-button>
+          <a-button type='default'>Resize 3</a-button>
         </div>
         <div>
           <a-space>
@@ -64,6 +75,8 @@ export default defineComponent({
       showStream: false,
       showScreen: false,
       showOnStream: false,
+      streamImageShowing: false,
+      screenImageShowing: false,
     }
   },
   setup() {
@@ -87,7 +100,9 @@ export default defineComponent({
   methods: {
     /*
     * This allows the browser to ask the user for audio or video input
-    * which would allow us to showcase the media footage as a stream 
+    * which would allow us to showcase the media footage as a stream.
+    * Sadly, I couldnt get this working to show the feed on the page even though
+    * it should.
     */
     async showUserTheirFace() {
       navigator.mediaDevices.getUserMedia({
@@ -101,14 +116,27 @@ export default defineComponent({
         // this has a slight lag when the user exits the modal.
         this.visible = false;
         this.showStream = true;
-        this.showingStreamOption();
       })
       .catch(err => alert(`${error.name}`));
+    },
+
+    showingScreenOption() {
+      // displays image in sidebar
+      this.showScreen = true;
+      this.visible = false;
+    },
+
+    streamImageOnStream() {
+      this.streamImageShowing = !this.streamImageShowing;
     },
 
     showingStreamOption() {
       // displays image in sidebar
       this.showOnStream = !this.showOnStream;
+    },
+    
+    screenImageOnStream() {
+      this.screenImageShowing = !this.screenImageShowing;
     },
   },
 });
@@ -153,8 +181,8 @@ export default defineComponent({
   transform: translate(0, 60px);
 }
 
-.iframe {
- aspect-ratio: 16/9;
- display: block;
+.stream {
+  aspect-ratio: 16/9;
+  display: block;
 }
 </style>
