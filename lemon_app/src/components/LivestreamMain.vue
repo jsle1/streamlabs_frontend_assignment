@@ -34,23 +34,25 @@
     <a-layout :style="{ marginLeft: '200px' }">
       <a-layout-header :style="{ background: '#fff', padding: 0 }" />
       <a-layout-content :style="{ margin: '24px 16px 0', overflow: 'initial' }">
-        <div class='stream' :style="{ background: '#000', padding: '24px', textAlign: 'center' }">
-          <div>
-              <div v-if='streamImageShowing'>
-                <img class='image_camera' style='aspect-ratio: 16/9;' alt='camera' src='../assets/camera.png' />
-              </div>
-              <div v-if='screenImageShowing'>
-                <img class='image_camera' style='aspect-ratio: 16/9;' alt='screen' src='../assets/screenshare.png' />
-              </div>
-          </div>
-            <video class='main_stream' style='aspect-ratio: 16/9;' autoplay playsinline></video>
+        <div class='stream' :style="{ background: '#000', textAlign: 'center' }">
+            <div v-if='streamImageShowing'>
+              <img class='image_camera' style='aspect-ratio: 16/9;' alt='camera' src='../assets/camera.png' />
+            </div>
+            <div v-if='screenImageShowing'>
+              <img class='image_screen' style='aspect-ratio: 16/9;' alt='screen' src='../assets/screenshare.png' />
+            </div>
         </div>
-        <div v-if='streamImageShowing'>
-          <a-button type='default'>Resize 1</a-button>
-          <a-button type='default'>Resize 2</a-button>
-          <a-button type='default'>Resize 3</a-button>
+        <div style='margin: 12px;' v-if='showStream && !showScreen'>
+          <a-button class='full_screen' type='default'>Full Screen</a-button>
+          <a-button class='80_screen' type='default'>80% Width</a-button>
+          <a-button  class='60_screen' type='default'>60% Width</a-button>
         </div>
-        <div>
+        <div style='margin: 12px;' v-if='showStream && showScreen'>
+          <a-button type='default'>Camera Bottom Right</a-button>
+          <a-button type='default'>Camera Bottom Left</a-button>
+          <a-button type='default'>Camera Right Split</a-button>
+        </div>
+        <div class='static_buttons'>
           <a-space>
             <a-button type='default'>Chat</a-button>
             <a-button type='default'>Record</a-button>
@@ -98,6 +100,9 @@ export default defineComponent({
     };
   },
   methods: {
+    screenImageOnStream() {
+      this.screenImageShowing = !this.screenImageShowing;
+    },
     /*
     * This allows the browser to ask the user for audio or video input
     * which would allow us to showcase the media footage as a stream.
@@ -109,6 +114,8 @@ export default defineComponent({
         video: true,
         audio: true,
       }).then(stream => {
+        // I know I should have the following video element to show the stream.
+        // <video class='main_stream' style='aspect-ratio: 16/9;' autoplay playsinline></video>
         const videoElement = document.getElementsByClassName('main_stream');
         
         videoElement.srcObject = stream;
@@ -126,17 +133,15 @@ export default defineComponent({
       this.visible = false;
     },
 
-    streamImageOnStream() {
-      this.streamImageShowing = !this.streamImageShowing;
-    },
-
     showingStreamOption() {
       // displays image in sidebar
       this.showOnStream = !this.showOnStream;
     },
-    
-    screenImageOnStream() {
-      this.screenImageShowing = !this.screenImageShowing;
+
+    streamImageOnStream() {
+      this.streamImageShowing = !this.streamImageShowing;
+      if (this.streamImageShowing) 
+        document.getElementsByClassName('full_screen').focus();
     },
   },
 });
@@ -182,7 +187,18 @@ export default defineComponent({
 }
 
 .stream {
+  overflow: hidden;
   aspect-ratio: 16/9;
-  display: block;
 }
+
+.stream img {
+  width: 100%;
+  position:relative;
+  object-fit: contain;
+}
+
+.static_buttons {
+  margin: 12px;
+}
+
 </style>
